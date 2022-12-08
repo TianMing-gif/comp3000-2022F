@@ -1,0 +1,26 @@
+Getting Started:
+1. downloaded and compiled
+2. insert 3000physicalview --- make insert
+3. 	a. put user do get from and give back to userspace in one call.
+This macro copies a single simple value from kernel space to user space. It supports simple types like char and int, but not larger data types like structures.
+	b. These functions are for safety purpose. You need to have the privilege to directly access which is dangerous.
+4. ioctl() manipulates the underlying device parameters of special files. 
+	-ioctl() should only be used for those operations that aren't provided by default in the kernel.
+	-ioctl takes a file descriptor --- physicalview_ioctl()
+	-struct file *file, unsigned int cmd, unsigned long addr
+
+Examining Physical Memory Mappings:
+1. no, the physical addresses on the right show no patterns overall
+2. 	-3000memview uses printf() on their virtual addresses
+	-3000memview2 uses the driver to report their physical and virtual addresses
+3. 	-the address allocating is incrementing both in physical and virtual addresses.
+	-The memory is managed (allocated) in pages. 
+4. 	-both virtual and physical addresses are changing.
+	-ASLR contributes to the change of virtual addresses
+	-the kernel allocates/deallocates memory pages hence the change of physical addresses
+	-main, lmsg, gmsg
+	-only lmsg and gmsg (in the data segment) and main (in the text/code segment) are from the program binary file 3000memview2, hence cached.
+
+Watching Kernel Memory Allocations:
+1. 	-A slab is the amount by which a cache can grow or shrink. It represents one memory allocation to the cache from the machine, and whose size is customarily a multiple of the page size.
+	-The page allocation code. attempts to allocate a block of one or more physical pages. Pages are allocated in blocks which are powers of 2 in size.

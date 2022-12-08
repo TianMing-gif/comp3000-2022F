@@ -1,0 +1,68 @@
+COMP 3000 2022F Midterm Exam
+Name: 
+Student ID: 
+
+1a. ret
+
+
+1b. call
+
+
+2. No, when the malloc size is not very big they do not need to make the system call. The system call to sbrk or mmap only called when making a large request.
+
+
+
+3. fork() create a child process. An if statement after fork() is to check currently at child process or the parent process. If the pid == 0 which mean it is the child process.1 is the parent process.
+
+
+4. the first three lines init three space for string and sign them with the value "fox","chicken",and "wolf". Next 4 lines define an array of pointers with the name animals.
+In C it might looks like: 
+
+char *animals[] = {
+        "fox",
+        "chicken",
+        "wolf",
+        '0'
+};
+
+
+5a. the assembly code implement the if statement.
+	if (g == the_number) {
+		puts("Got it!\n");
+	}
+
+5b. the_number will not appears elsewhere in this assembly, because it is an extern int which means there is another file defines it.
+
+
+6. 	if (execve(bin_fn, args, environ)) {
+		puts(strerror(errno));
+		exit(127);
+        }
+where bin_fn is the address 'bin/ls'
+      args is array with '-l'
+
+
+
+7. The wait in run_program is in the parent process which is waiting the child process to terminate. 
+the wait in signal_handler did nothing because before wait it checks the SIGHUP and SIGCHLD which checks controlling terminal closed and child process ended. The wait at here has nothing to wait for which will just return.
+
+8. the fork() library call make a system call to clone(). It is possible to make a system call to fork() by forcing it in assembly code, but it is not possible to work in C. Because you cannot create standard C code that causes a "syscall" assembly language instruction to be generated. 
+
+
+9. the internal commands are different, because internal command are writing in the shell, we can see 3000shell2 support exit, pinfo, and become internal commands which is different to bash. However, the external commands are the same. because the shell will follow the PATH to check each direction for the external commands file. If the file exist every shell can call these external commands.
+
+10. 
+First is to use chmod u+s to give the permission to setuid
+Second is to use sudo chown root to set user root
+
+11. It will not change the default ownership, but after setuid root the filesystem will now running under root privilege, only the uid will change to 0.
+
+
+12. No, if 3000shell2 is run as setuid root, commands are still run as the user
+who started 3000shell2. Because before doing anything, the 3000shell2 will set euid and egid to be its uid and gid which limit their privilege. Any commands running after that are running as the user who started 3000shell2.
+
+
+13. the /etc/passwd file. Because it stores all the user acounts and their UID, GID.
+
+
+14. the bash opens logfile. Because the > operator is handle by the shell. Just like 3000shell2, there is a part to handle > operator.

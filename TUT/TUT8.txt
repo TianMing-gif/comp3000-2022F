@@ -1,0 +1,37 @@
+Part A:
+1.	a. it create a file f1 with the urandom value
+	b. -a flag is archive, special file?
+	c. it seems did the same as b
+	d. this cannot happen with a non-privileged user.
+	e. mknod create a special or ordinary file
+c for character device; 1 for major number the kernel to use; 9 is the minor number for internal usage
+2. mkfifo file1; ls | wc;
+3. no
+4. they do not act the same. modern Linux systems the copy often doesn't behave like the original
+5. 
+disabling local echo using ---- stty -echo
+restore local echo using ------ stty echo
+
+Part B:
+1. done
+2. done. the kernel log is store at var/log/kern.log
+3. use command lsmod you can see all the models
+4. use insmod to load, use rmmod to remove the module from the kernel
+5. trace command will trace a function and print its arguments or return value.
+	it will use Linux eBPF
+
+Part C:
+1. done
+2. it create a file that print infinite 1's
+3. becaue the 1 it output are all at the same line, so head or tail is not work
+	awk cut
+4. remove the error handling part in ones module
+5. 
+
+Part D:
+1. done 
+2. Current is a global variable of type struct task_struct
+	when the kernel is processing a system call, the task that made the system call is referred to as "current" 
+3. at line 106, device is create with the device name as newgetpid
+4. ppid, uid, gid, euid, egid
+

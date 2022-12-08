@@ -1,0 +1,131 @@
+COMP 3000 2022F Assignment 4
+Name: Tian Ming
+Student ID: 101143804
+
+Collaborators:
+
+1. 
+It print the register information:
+Dec  4 23:11:51 comp3000 kernel: [1150145.381001] comp3000: procreport device registered using major 2
+
+2. 
+It report:
+Your PID is 80537!
+Buffer at 0x00007f204bee1000 virtual is at 0x0000000089b4d000 physical.
+
+This report use the format from line 114 to 117 in c3000procreport.c
+	-the pid is getting using task_tgid_vnr(current) which return the process ID of the current task
+	-the buffer is a pointer to the current userspace
+	-the physical memory is the return from procreport_get_physical which get the physical page memory using page frame number(pfn)
+
+3. 
+open called.
+read called.
+get_physical called.
+read returned 92.
+release called.
+
+Why are we getting this output? Explain what you see.
+
+-the watch_procreport.bt file using Kprobe and Kretprobe to log some specific events.
+-the events are all from the c3000procreport module. (procreport_devnode，procreport_get_physical，procreport_open，procreport_read，procreport_release)
+-when "dd if=/dev/procreport bs=1024 count=1" running, the module will been execute.
+-procreport_open been called first, then was the procreport_read, in the read it called the procreport_get_physical. After that, Kretprobe catched the procreport_read returned. Finally, when finished, release been called.
+
+4. 
+it will wait for some input. because the seek=1 asks to skip 1 block before write something.
+-it will wait for some input that has a size 1024 bytes, if adding an output file, the first block will be a hole, then is the information in procreport.
+-watch_procreport.bt gives limited insight on what is happening. It only report 'open called' and wait. The rest will report until handled the first block.
+
+5. 
+the second parameter in put_user 'buf' is a pointer to userspace address space, not the kernel address space. 
+-In order to get data from or put data into that specific address space, it is important to do the address space translation using put_user, it is safer.
+-a simple array assignment at here is unsafe it might cause kernel memory corruption.
+
+6. 
+if line 111 is removed, the physical page it report is always 0x0000000000000000
+-the kern.log reports 'Invalid pte for address 0x00007f39848f0000'
+-pte_none is used to test for empty PTE
+the line 111 is used to initiallize the buf so that the PTE is not empty
+-it is not important what value it assign to.
+
+7. 
+This is similar to allocating and deallocating.
+-Line 104 find a zeroed page and prepare for saving the message using this page.
+-Line 132 free the above page after finish using.
+-If line 104 removed, there is no assigned page for the message, it might cause memory corruption.
+-If line 132 removed, the page will occupied by the message.
+
+8. 
+add at the start of procreport_read():
+	int count, j;
+	struct task_struct ptrstruct;
+
+change line 114-117 to:
+        count = 0;
+        count += snprintf(message+count, PAGE_SIZE - count,
+                 "Your PID is %d!\n"
+                 "Buffer at 0x%016lx virtual is at 0x%016lx physical.\n",
+                 thepid, (unsigned long) buf, buf_phys);
+
+        ptrstruct = current;
+        for (j=0;j<10;j++)
+        {
+                if (ptrstruct->pid != 0){
+                        count += snprintf(message+count, PAGE_SIZE - count,
+                        "%d 's Parrent PID is %d\n",
+                        ptrstruct->pid,ptrstruct->parent->pid);
+                        ptrstruct = ptrstruct->parent;
+                }
+        }
+        count++;
+
+sample output:
+108510 's Parrent PID is 107025
+107025 's Parrent PID is 107022
+107022 's Parrent PID is 106927
+106927 's Parrent PID is 702
+702 's Parrent PID is 1
+1 's Parrent PID is 0
+
+9. 
+the address is virtual address as one would access it inside kernel.
+it has a clear increment form.
+
+#create a struct:
+struct mystruct {
+        pgd_t *pgd;
+        p4d_t *p4d;
+        pud_t *pud;
+        pmd_t *pmd;
+        pte_t *pte;
+};
+
+#the interface change to: 
+procreport_get_physical(unsigned long addr, struct mystruct **tempstruct)
+
+#add this in procreport_get_physical():
+	(*tempstruct)->pgd = pgd;
+        (*tempstruct)->p4d = p4d;
+        (*tempstruct)->pud = pud;
+        (*tempstruct)->pmd = pmd;
+        (*tempstruct)->pte = pte;
+
+#in procreport_read():
+#init a mystruct and it's pointer:
+        struct mystruct tstruct;
+        struct mystruct *tempstruct;
+        tempstruct = &tstruct;
+	
+#change the call to:
+buf_phys = procreport_get_physical((unsigned long) buf, &tempstruct);
+
+#change the snprintf to:
+count += snprintf(message+count, PAGE_SIZE - count,
+	"Your PID is %d!\n"
+	"Buffer at 0x%016lx virtual is at 0x%016lx physical.\n"
+	"the intermediate address: %p; %p; %p; %p; %p\n",
+	thepid, (unsigned long) buf, buf_phys, tstruct.pgd, tstruct.p4d, tstruct.pud, tstruct.pmd, tstruct.pte);
+
+#sample output:
+the intermediate address: 000000000f532571; 000000000f532571; 0000000098df4f49; 000000004ac29ca3; 0000000044e77121

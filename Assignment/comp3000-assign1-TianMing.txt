@@ -1,0 +1,62 @@
+COMP 3000 2022F Assignment 1
+Name: Tian Ming
+Student ID:101143804
+
+Collaborators:
+
+1.
+They are:
+	run_program:
+ 	choose_program:
+	main:
+Because they are with the ':' symbol and the lines ofter these lines are the function part.
+
+2. 
+environ is defined as a global variable in the Glibc source file which do not need to define in s file.
+(Source: https://stackoverflow.com/questions/10649273/where-is-the-definition-of-extern-char-environ)
+
+
+3. 
+line 208 in 3000menu.s defines the menu array. The constant strings it points to are at line 197, 199, 201, and 203.
+
+
+4. 
+lines 171-173 of 3000menu.s.
+	line 171 --- call the choose_program function
+	line 172 --- compare the return with QUIT
+	line 173 --- jump to .L22 which end the proc
+
+
+5. 
+No, the call to getline will not result in additonal system call. Because malloc will only use mmap() system call when asking for very large request. It is a library call at here.
+(Source: https://www.linuxjournal.com/article/6390)
+
+6. 
+The program will end after only one round. 'pid = 0' is to init the pid value which will not create child process like fork(). The 'exit(-1)' at line 32 will exit the main process, so the while loop in main function will not occure.
+
+7a. 
+Because the second parameter of execve() passes in a pointer of the execute code which should end with NULL pointer.
+
+7b. 
+because the change in child process will not influence other process
+
+
+8. 
+If the parent process not wait for child process, it cannot find the state of the child process and it will become a "zombie" process which will not release the system resources.
+(Source: https://stackoverflow.com/questions/39976499/the-purpose-of-the-wait-in-parent-c)
+
+
+9a. 
+It is dynamically linked
+    
+9b.
+The ltrace shows that 3000menu's library calls include something about fork where 3000menu-q9 does not have. Because the fork() in 3000menu is not using the system call fork. It goes into glibc (library) and call clone system call.
+(Source: https://en.wikipedia.org/wiki/Glibc)
+
+9c.
+The difference is the way they creating child process. 3000menu using system call clone while 3000menu-q9 using system call fork to create child process.
+(Source: https://unix.stackexchange.com/questions/199686/fork-vs-clone-on-2-6-kernel-linux)
+
+
+9d.
+Without using libraries 3000menu.c cannot compile to use sys_fork. sys_fork is Linux-specific; other UNIX variants are not required to implement it due to the glibc currently using.

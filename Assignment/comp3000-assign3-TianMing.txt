@@ -1,0 +1,78 @@
+COMP 3000 2022F Assignment 3
+Name: Tian Ming
+Student ID: 101143804
+
+Collaborators:
+
+1. 
+There are three rm commands in the script.
+Most of the time it is no risk. But if you have the file or folder with the same name, they will be removed without any message.
+If you saved some data in the 3000fs container, they would all clean up when the script runs.
+
+2. 
+using the code line 65 at the 3000fs directory.
+Add sudo at the front to run it as root:
+sudo unshare --root=. -f -p --mount-proc
+
+3. 
+outside:
+    PID TTY          TIME CMD
+  33924 pts/0    00:00:00 bash
+  33964 pts/0    00:00:00 ps
+inside:
+PID   USER     COMMAND
+    1 root     -bash
+   15 root     ps
+The different is from the busybox. The ps outside is a normal ps, but inside the confined environment the ps is install from busybox.
+This can be tested by running 'busybox ps' outside the environment.
+It will output the same syntax as inside the environment.
+The part cause this different is line 58, 'busybox --install'
+
+4. 
+It write a line to the busybox script.It will run at line 63 when the script is called.
+It will create links to itself for all the various commands in /bin, /sbin, /usr/bin, and /usr/sbin. And the links are all hardlinks.
+Source: https://github.com/MichielDerhaeg/build-linux/issues/17
+
+5. 
+The limit is determined by line 25, the zero file that being created.
+It set the blocksize 8192 bytes and the number of blocks 60000, total 491520000Bytes about 3750MB.
+
+6. 
+When filled up the disk in the host system, it will use the empty space in confined environment. 
+This is a Physical size vs Logical size problem. physical size<= logical size.
+The free space between physical size and logical size can be used to store other files.
+It depends on the previously stored files' logical size. If there is still free space, they can be occupied by the host.
+
+7. 
+Because those files are hardlinked. They are copy from the busybox file.
+If commit line 57 to 64, the busybox will not run the install, now if open the 3000fs/usr/bin, there is only one file "busybox" there with the same inode.
+
+8. 
+similar to what the script did for bash.
+the requirements can be found using ldd /bin/nano, ldd will give you all the dependency to run that file
+add these lines at line 46,
+cp /bin/nano bin
+cp /lib/x86_64-linux-gnu/libtinfo.so.6 lib
+cp /lib/x86_64-linux-gnu/libc.so.6 lib
+cp /lib/x86_64-linux-gnu/libncursesw.so.6 lib
+then the nano works in the new environment
+
+9. 
+check the man page of useradd, there is a -R flag that can apply the changes in a chroot directory. And -m is used to create the home folder.
+Add the following in the script after line 64:
+useradd -R 'directory of 3000fs' -m contain
+
+Resource: classmate Chengjie Mao
+
+10. 
+type 'findmnt' outside (root filesystem), it will give information about all filesystems in a tree-type format. The top one is the root filesystem, with the source at '/dev/mapper/vg0-lv--0'
+so, in the confined environment:
+mkdir rootfs
+mount /dev/mapper/vg0-lv--0 rootfs
+this will mount the root filesystem to the folder rootfs.
+
+11. 
+check the man page of unshare, there is a paragraph about UTS namespace: Setting hostname or domainname will not affect the rest of the system. 
+Therefore, just add the uts flag to the unshare.
+Change line 65 to 'unshare --uts --root=. -f -p --mount-proc'.
+Then, use 'hostname mycontainer' in the confined environment, only the hostname in the confined environment changed.

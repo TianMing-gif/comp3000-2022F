@@ -1,0 +1,56 @@
+Part A:
+1.done
+2.done
+3.done
+4.they behave almost the same. But the time they stop (sleep) is different.
+	fifo starts from sleep for 1s, rendez starts from waiting for producer
+5.the fifo is using pipe , 
+	rendez is using mmap and futex
+6.done
+7.done
+
+Part B:
+1.a. it open a pipe that has one read end and one write end.
+1.b. the pipefd[0] is the end for consumer
+1.c. the pipefd[1] is the end for producer
+1.d. the random is to avoid the deadlock
+2. the random is not random it will print the same data.
+3. /* Open a fifo
+         * pipefd[0] will be open for reading, and
+         * pipefd[1] will be open for writing */
+4. it will working normally, since there are multiple process
+
+Part c:
+1.a. this uses thread and fifo uses process
+	fifo uses srandom and this uses /dev/urandom
+1.b. mmap()  creates  a  new mapping in the virtual address space of the calling process.
+1.c. /* Don't sleep if interval <= 0 */
+                if (prod_interval <= 0)
+                        continue;
+                /* Sleep if we hit our interval */
+                if (i % prod_interval == 0)
+                {
+                        fprintf(stderr, "Producer sleeping for 1 second...\n");
+                        sleep(1);
+                }
+
+1.d. /* Don't sleep if interval <= 0 */
+                if (con_interval <= 0)
+                        continue;
+                /* Sleep if we hit our interval */
+                if (i % con_interval == 0)
+                {
+                        fprintf(stderr, "Consumer sleeping for 1 second...\n");
+                        sleep(1);
+                }
+
+2. set the second input to 0; ×
+	check the size of the queue, the fixed size is 32, so if my input is 33 greater than the queue, the consumer or the producer will have to wait at least once.
+3. set the third input to 0; like 1 1 0 ×
+4. yes this is true, threads under same process is shared the same memory, and processes never share memory
+5.urandom will never block
+	random will blocks when it runs out of entropy
+6.it is not break but it goes into a infinite loop
+7. the 3000pc-rendezvous deadlock.
+	3000pc-rendezvous-timeout adds timeouts to waiting for all locks.
+8. it seems the fifo is faster

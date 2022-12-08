@@ -1,0 +1,89 @@
+COMP 3000 2022F Assignment 2
+Name: Tian Ming
+Student ID:101143804
+
+Collaborators:
+
+1. 
+As my understand, the internal commands for a shell is written in the shell.
+3000shell2 support: become, pinfo, exit, ls
+3000shell support: plist, exit, ls
+
+2. 
+like 3000shell.c: gcc -O -g -Wall 3000shell2.c -o 3000shell2
+like 3000userlogin.c: gcc -Wall -O 3000shell2.c -o 3000shell2
+
+There is no different between their pinfo, uid=1000, euid=1000, gid=1000, egid=1000
+
+3. 
+The purpose is to make sure the effective user id and the effective group id is the same as the current real user id and real group id. If there is only one user it is not useful.
+
+4. 
+become + username + command
+
+5. 
+the user want to become use exist
+
+6. 
+The idea is to check the next arg after become, if it is a string then treat it as a username, if it is an integer treat it as an uid.
+
+function become:
+void become(char *newinfo)
+{
+        int result;
+        struct passwd *pw_entry;
+	
+	if(isdigit(newinfo)){
+		pw_entry = getpwuid(newinfo);
+	
+	}else{
+		pw_entry = getpwnam(newinfo);
+	}
+        
+        if (pw_entry == NULL) {
+                fprintf(stderr, "Could not find user %s.\n", newinfo);
+                exit(-2);
+        }
+                       
+        result = setgid(pw_entry->pw_gid);
+        if (result != 0) {
+                fprintf(stderr, "Failed to change to gid %d\n",
+                        pw_entry->pw_gid);
+                exit(-3);
+        }
+
+        result = setuid(pw_entry->pw_uid);
+        if (result != 0) {
+                fprintf(stderr, "Failed to change to uid %d\n",
+                        pw_entry->pw_uid);
+                exit(-4);
+        }
+}
+7. 
+setuid root: chmod u+s filename ==> uid=1000, euid=1000, gid=1000, egid=1000
+running as root : sudo filename ==> uid=0, euid=0, gid=0, egid=0
+
+8. 
+the redirection is not working for pinfo, because the redirection is checking in run_program function where pinfo will not reach.
+
+9. 
+the idea is to check background keyword after become keyword checked. There is only one argument after background keywork which is the stdin; all other information are in the stdin file.
+
+at line 262:
+if(!strcmp(args[0], "background")){
+	if(nargs >3){
+		stdin_fn = args[1];
+		stdout_fn = args[2];
+		stderr_fn = args[3];
+		args = args + 4;
+		nargs = nargs - 4;
+
+	}else {
+		fprintf(stderr,"ERROR: need a stdin\n");
+	}
+}
+
+the run_program function takes two more parameters stdin_fn and stderr_fn
+
+10. 
+The new background can be combine with become because the checking for become keyword does not have 'continue' at the end which means it will stay in this loop and finish the code below. It will check become and then check background keyword later.

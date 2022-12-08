@@ -1,0 +1,65 @@
+1.
+a)
+hostnamectl
+cat /etc/*-release
+lsb_release -a
+b)
+echo $0
+echo $SHELL
+c)
+free -m
+cat /proc/meminfo
+vmstat -s
+sudo dmidecode
+
+2. 
+which - locate a command
+pwd - print the name of the current directory
+who - show who is logged on
+whoami - print effective userid
+whereis - locate the binary, source, and manual page files for a command
+
+3. 
+use type command to find the command is internal or external
+internal command will show shell buildin
+
+cat    -command is at /usr/bin/cat
+chmod  -command is at /usr/bin/chmod
+touch  -command is at /usr/bin/touch
+
+4.
+To show the documentation use:
+printf "%s\n" $PATH
+echo "${PATH//:/$'\n'}"
+export PATH=$PATH:$(pwd)
+
+To make it permanently add the information into the /.bashrc file
+
+5. the user root own them and they are in root group
+
+6. 
+|    x    |    x    |    x    |
+     ↑         ↑         ↑
+    read      write    execute
+
+001 execute only
+010 write only
+100 read only
+
+7.the owner of these two files are user root. passwd is in root group and shadow is in shadow group. passwd is a file other users can only read and shadow is a file other users not allowed to read.
+It is used to keep track of every user on the Linux system
+
+8.Execute permission is the right to execute the file, or allows you to enter the directory, and to access any of its files.
+
+9. 
+-l to show the permission bits
+-a to show all files 
+
+To hide a file create a file and move it to a file with a dot at the front
+touch file.txt
+mv file.txt .file.txt
+
+10. the csimpleshell hide the title before each line.
+the csimpleshell shows the start and end of a command
+it print out the pid everytime
+csimpleshell is running on the bash shell which means the permission level is lower than bash.

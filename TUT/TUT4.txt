@@ -1,0 +1,41 @@
+1. use 3000userlogin to login without password
+use the root user
+./3000userlogin other
+
+2. passwd *getpwnam(const char *name)
+   it returns pw_name, pw_passwd, pw_uid, pw_gid, pw_gecos, pw_dir, pw_shell
+
+3. regular user:uid=1000, euid=1000, gid=1000, egid=1000, Failed to change to gid 1002
+   setuid root: uid=1000, euid=0   , gid=1000, egid=1000 which will change
+                                 ↓
+                uid=1000, euid=0   , gid=1002, egid=1002
+   root:        uid=0   , euid=0   , gid=0   , egid=0   
+   
+4.it might because if the uid changed first, it will become regular user later. If change pid now it will fail.
+
+5. ./3000userlogin
+            after: uid=1002, euid=1002, gid=1002, egid=1002
+chsh replaces the shell /etc/passwd. 
+The problem is /bin/bash is hardcoded. use pw_entry ( /bin/bash )
+then chsh is used everytime
+
+6. the change is adding bin/3000shell to the text. but the username is null ???
+maybe change the env to USER will work
+
+7.No, regular shell is not default. Yes it can be an arbitrary program.
+/etc/shells should include the program if you want to use arbitrary program.
+
+8.I think it is not important. After login there will be no new variables.
+
+9. envp will not change by *env() ex.put or set..
+
+10. |grep setgid ----> setgid(1002)
+    |grep setuid ----> setuid(1002)
+
+11. √
+12. √
+13. the files /etc checking by ls -l
+        ↓
+    error.log
+    login via ssh: shell run first then the command
+    

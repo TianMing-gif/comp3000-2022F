@@ -1,0 +1,26 @@
+1.
+2. try with simple programs: the program running in the background will show the PID, and need to press another Enter to exit
+3. you can use Ctrl + c to stop
+4. each of the system call is happens in the assembly code and there is no different between parent or child processes.
+5. the 3000shell.c shows the syntax for output redirection is like ">" 
+	hello_world > file_name
+6. check pid == -1 allowed the process to return without waiting.
+7. 
+8. if (the_signal == SIGUSR1) {
+	fprintf(stderr, "Ouch!\n");
+	return;}
+   if (sigaction(SIGUSR1, &signal_handler_struct, NULL)) {
+	fprintf(stderr, "Ouch!\n");}
+9. sometimes it return failure with error code EINTR
+   or the library function can resume.
+   because the SA_RESTART controls signal delivery.
+10. The difference between them is getenv() only takes 1 parameter, but find_env() takes 3 parameters. The environment variable is getting from main.
+11. just output the PPID of the process
+12. use the redirection syntax above. ">"
+13. at line 308
+    if(!strcmp(args[0], "plist")) {
+	plist(stdout_fn)；
+	continue；
+    }
+    and then change the output print funtion.
+14. SIGKILL or -9

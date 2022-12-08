@@ -1,0 +1,69 @@
+Part A
+1. Regular Text File: Shows file name, inode #, file size, and the frequency of the letter 'a' in the file.
+   Directory: Shows directory path, inode #, and the directory size.
+   Symbolic Link: Shows symbolic link name, inode # and file size.
+   Device File: Shows path of device file, inode # and file size.
+2. For a symbolic link, it shows a different inode #/file size and no longer displays the frequency of the letter 'a' in the file. The rest is the same.
+                    ↓
+        if (lstat(fn, &statbuf)) {
+                report_error(strerror(errno));
+        }
+3.	
+Add the following after lstat:
+buffer = malloc(len);
+if (buffer == NULL){
+	perror("malloc");
+	exit(EXIT_FAILURE);
+}
+bytes = readlink(fn, buffer, len);
+	if (bytes != -1){
+		printf("'%s' points to '%.*s'\n", fn, (int) bytes, buffer);
+	}
+4. no there are not, it seems like the 3000test is checking the inode which every file should have one.
+
+5. how to get the memery size while running? what command do we use? 
+	top? how to get the PID?
+	Run it at the background so that it will give the PID while running, then use top to check the PID and the &mem column is for the memory using.
+	
+
+part B:
+1. the number at the left is the inode number
+2.read the /dev/zero to foo with block size 8192 and repeat it 32K times.
+it used 256M size.
+3.it discarding device block. So it does not consume more space.
+	the difference is the logical size and the physical size..
+	physical size >= logical size.
+	the UNIX will make a "hole" to where do not need to allocate on disk.
+	mkfs.ext4 will punch bunch of holes into the file.
+	it will not generate holes itself. you have to run "lseek"
+4. it gives information of the filesystem. 
+5. when we mount something, it is always mount from a file device
+6. it mount the filesystem
+7. df is a loop back file system
+	dev/loopX is the block device using in file system.
+	/mnt -> loopX -> foo
+
+8. done
+9. it sending incremental file list.
+	this is a command to clone machine.
+10. loopX is no longer mounted on /mnt. the files in /etc and /lost+found can no longer access.
+11. conv=notrunc means dd will not truncate the output file.
+12. wrong fs type, bad option, bad superblock on /dev/loop, missing codepage or helper program, or other error.
+13. run mkfs.ext4 again to make foo mountable again. The reason is because we added more zero's to the filesystem.
+14. truncate will directly create a file with one big hole, so all zero space on disk, but with the logical size 1G.
+15. there will be no change on that, because the truncate command will create a file already have hole, the ext4 cannot create more on it.
+
+Part C:
+1. one is hard link the other is symbolic link.
+	The hard link is direct to the inode
+	the symbolic link is to the file itself.
+2. mount is a setuid root program that need the root privileges.
+	a regular user process cannot mount filesystems.
+3.only the user ran sshfs can access the mount. 
+	sudo sshfs -o allow_other user
+4.ls -i
+	inode values are different in remote vm vs local vm
+	the remote using the inode in there filesystem
+5. the local drive is faster.
+6. yes, I can use my name and my password
+7. umount [filename]

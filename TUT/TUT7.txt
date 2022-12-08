@@ -1,0 +1,55 @@
+Part A
+1. it prints a list of tracing points
+	tplist - Display kernel tracepoints or USDT probes and their formats.
+2. done
+3. tracepoint:raw_syscalls:sys_enter
+	it reads all the enter of raw_syscall in the tracepoint.
+4. /sys/kernel/debug/tracing/events
+5. /sys/kernel/debug/tracing/events/syscalls/sys_enter_kill/format
+6.  TRACE_EVENT(name, proto, args, struct, assign, print)
+	name - the name of the tracepoint to be created.
+	prototype - the prototype for the tracepoint callbacks
+	args - the arguments that match the prototype.
+	struct - the structure that a tracer could use (but is not required to) to store the data passed into the tracepoint.
+	assign - the C-like way to assign the data to the structure.
+	print - the way to output the structure in human readable ASCII format.
+7. TRACEPOINT_PROBE(syscalls, sys_enter_open) {
+        bpf_trace_printk("sys_write(filename: %lu)", args->filename);
+   }
+
+Part B
+1. 
+ls - 	/etc/ld.so.cache
+	/lib/x86_64-linux-gnu/libselinux.so.1
+	/lib/x86_64-linux-gnu/libc.so.6
+	/lib/x86_64-linux-gnu/libpcre2-8.so.0
+	/proc/filesystems
+	/usr/lib/locale/locale-archive
+	.
+
+top - they are at /proc/x/stat or /proc/x/statm
+
+bash and static-sh - there is no significant difference they both open dev/tty and etc/passwd
+
+3000shell - 	/etc/ld.so.cache
+		/lib/x86_64-linux-gnu/libc.so.6
+
+2. 	a. no some builtin functions will not execve system call
+	b. non-existent command will call command-not-found syscall, 3000shell will open itself
+	c. it build environemt and check the user -  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+execsnoop watch all the exe
+
+3. 	a. yes, 
+	b. yes
+	c. yes, but is not at this system file
+	d. yes
+	e. yes, signal 0 is used to check in the system send by systemd-journal
+killsnoop watch all the kill signals
+
+4. 	a. syscall[232] sys_epoll_wait
+	b. 
+statistic on every system call
+
+5. 	a. it record every program that running bash
+	b. bash readline
+	c. because it only readline that created after it run

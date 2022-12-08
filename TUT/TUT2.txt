@@ -1,0 +1,31 @@
+PART A:
+1. it compiles the program to a executable file
+2. the static one has a much bigger size, maybe because it includes the dependency by itself.
+3. it shows that the static one is not dynamic executable
+4. the dynamic one has more system calls
+5. the dynamic one has more library calls
+6. it is the same as library-dyn.log 
+(lazy defer function-call resolution to the point when the funciton is called, rather than at load time)
+7. student user owns these files; student group; only the owner can write the file and every user can execute the compiled file.
+8. 
+
+PART B:
+1. prog-static defines more symbols
+2. it produces a *.o file which is an object file, the compiler can link object files together to form the executable file.
+3. it creates a source code file; 
+ call    puts@PLT
+ ret
+ subq    $16, %rsp
+
+4. the disassembly is shorter and only focus on the processing steps
+5. objdump -h (section-headers)
+6. objdump -s (full contents)
+7. Print the commands executed to run the stages of compilation.
+Print the version number of the compiler driver program and of the preprocessor and the compiler proper.
+
+PART C:
+1. because every time run the ./3000memview the OS will find a ramdom place to store the variables.
+2. code??
+3. it seams like heap and stack are using the same space, if heap grows the space of stack will reduce. heap stores the dynamic memory and stack stores local variables
+4.it value before malloc and after is the same; because when malloc more than 127KB instead of using sbrk it will use mmap to allocate memory as a private anonymous mapping.
+5. (⊙o⊙)? 
